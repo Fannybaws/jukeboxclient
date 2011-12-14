@@ -1,6 +1,9 @@
 // jukeboxclient
 //
 // Author: Fannybaws Tunwarm
+// Copyright 2010,2011 - Fannybaws Tunwarm
+// This script may be freely copied and modified so long as this header
+// remains unmodified.
 // 
 // v2.0 - Initial upload to github
 // renamed to jukeboxclient and now using jukeboxserver.php server side
