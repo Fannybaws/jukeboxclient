@@ -1,0 +1,143 @@
+<?PHP
+	// Author Fannybaws Tunwarm
+	// General Public License (GPL).
+	
+	//jukeboxserver.php
+	
+	//Output text
+	header("content-type: text/plain; charset=utf-8");
+	//grab the headers (headers code based on code by Waster Skronski)
+	$headers = apache_request_headers();
+	//Get the serverkey and the ownerkey for validation
+	$serverkey = $_GET["serverkey"];
+	$ownerkey = $headers["X-SecondLife-Owner-Key"];
+	
+	//Set up some valid keys
+	
+	//Fannybaws Tunwarm
+	$users[0] = array('serverkey' => 'SERVERKEY_UUID' , 'ownerkey' => 'OWNER_UUID');
+	//Kappa FaeBrillyunt
+	$users[1] = array('serverkey' => 'SERVERKEY_UUID' , 'ownerkey' => 'OWNER_UUID');
+	//Fannybaws FaeBrillyunt
+	$users[2] = array('serverkey' => 'SERVERKEY_UUID' , 'ownerkey' => 'OWNER_UUID');
+	
+	//Check for an authorised user
+	$authorised = false;
+	foreach ($users as $thisUser)
+	{
+		$thisServerKey = $thisUser[serverkey];
+		$thisOwnerKey = $thisUser[ownerkey];
+		//echo $thisServerKey . " - " . $thisOwnerKey . "\n";
+		//echo $serverkey . " - " . $ownerkey . "\n";
+		
+		if ( ($thisServerKey == $serverkey) && ($thisOwnerKey == $ownerkey) )
+		{
+			$authorised = true;
+			//break;
+		}
+	}
+		
+	
+
+	
+	if (!$authorised)
+	{
+		//Invalid serverkey
+		echo "AUTH - YOU ARE NOT AUTHORISED TO USE THIS SERVER";
+		appendLog($headers, "Unauthorised access");
+		exit;
+	}
+
+	if ($_GET["list"])
+	{
+		if ($handle = opendir("mp3/"))
+		{
+			echo "LIST";
+			$folderlist = '';
+		    while (false !== ($file = readdir($handle)))
+		    {
+		        if ($file != "." && $file != "..")
+		        {
+			        $folderlist .= $file . ",";
+		        }
+		    }
+		    $folderlist = substr($folderlist, 0, -1);
+		    echo $folderlist;
+		    closedir($handle);
+			appendLog($headers, "received folderlist");
+		}
+	}
+	else if ($_GET["folder"])
+	{
+		$path = 'mp3/' . $_GET["folder"] . '/';
+		$return = file_get_contents($path . 'list.txt');
+		echo  'FOLD' . $return;
+		appendLog($headers, "received contents of folder " . $_GET["folder"] );
+	}
+	else
+	{
+		$path = 'mp3/ballads/';
+		$return = file_get_contents($path . 'list.txt');
+		echo $return;
+		appendLog($headers, "received contents of folder ballads" );
+	}
+
+	function appendLog ($headers, $message)
+	{
+		if ($message == "")
+		{
+			return; //exit quietly if empty string
+		}
+		$timestamp = date("d-m-Y H-i-s");
+				
+		
+		//$headers 		= apache_request_headers();
+		$objectgrid 	= $headers["X-SecondLife-Shard"];
+		$objectname 	= $headers["X-SecondLife-Object-Name"];
+		$objectkey     	= $headers["X-SecondLife-Object-Key"];
+		$objectpos 		= $headers["X-SecondLife-Local-Position"];
+		$ownerkey     	= $headers["X-SecondLife-Owner-Key"];
+		$ownername 		= $headers["X-SecondLife-Owner-Name"];
+		$regiondata     = $headers["X-SecondLife-Region"];
+		$regiontmp 		= explode ("(",$regiondata); // cut cords off 
+		$regionpos 		= explode (")",$regiontmp[1]); //
+		$regionname 	= substr($regiontmp[0],0,-1); // cut last space from simname
+		
+		
+		if ($objectgrid == "")
+		{
+			//Someone calling us directly?
+			$objectgrid = "No grid!";
+			$thisMessage = $timestamp . " " . $objectgrid . " " . $message . "\n\n";
+		}
+		else
+		{
+			//Looks like a valid call from opensim
+			//$thisMessage = $timestamp . " " . $objectgrid . " " . $message . "\n";
+			$thisMessage = $timestamp . "\n"
+							. "Grid = " . $objectgrid . "\n"
+							. "Object Name = " . $objectname . "\n"
+							. "Object Key = " . $objectkey . "\n"
+							. "Object Position = " . $objectpos . "\n"
+							. "Owner Key = " . $ownerkey . "\n"
+							. "Owner Name = " . $ownername . "\n"
+							. "Region Name = " . $regionname . "\n"
+							. "Server key = " . $_GET["serverkey"] . "\n"
+							. $message . "\n\n";
+		}
+		
+		//Try to open file
+		$myFile = "logs/log.txt";
+		$fh = fopen($myFile, 'a');
+		if ($fh)
+		{
+			fwrite($fh, $thisMessage);
+			fclose($fh);
+		}
+		else
+		{
+			return; // exit quietly if we can't open log file
+		}
+	}
+
+?>
