@@ -5,102 +5,28 @@
 // This script may be freely copied and modified so long as this header
 // remains unmodified.
 // 
-// v2.0 - Initial upload to github
+// v2.0 - Initial upload to github, These infile version details will no longer be updated!
 // renamed to jukeboxclient and now using jukeboxserver.php server side
-// Will need customised versions for each user as serverkey is unique to them
-//
-// v1.98
-// Now using test12.php
-//
-// v1.97
-// Now using latest php file on server
-//
-// v1.96
-// Added a check to look for AUTH returned from the server if key is invalid or missing
-// and let the owner know what the problem is.
-// 
-// v1.95
-// Adding a key to the parameter list that will be checked for server side to prevent unuathorised use
-// 
-// v1.94
-// No longer need the chat_listen global
-// 
-// v1.93
-// Removed dump_spacers() from timer() to stop spam to owner every time track changed 
-// 
-// v1.92
-// Changing llSay to llOwnerSay and cleaning up output
-// 
-// v1.91
-// Added checks to touch_start so that only the owner sees the dialog
-// If any other user tries to touch it, they will receive an IM telling them that only owner can use the object
-// 
-// v1.9
-// Changing the 'Change' option to 'Reset' so that it reads the folders again (useful if script has been running
-// a while.
-// 
-// v1.8
-// First attempt at clean-up, removing old chat commands
-// Now removing error checking from some functions - shouldn't be needed if dialogs are done right :)
-// Now removing some debug chat
-// TODO - Do we need the playing integer?
-// 
-// v1.7
-// Added Change button to Dialog (to change folder) but doesn't do anything yet
-// 
-// Added Code for the Playlist button to dump the playlist
-// v1.6
-// Added code to show folder buttons if box is touched when no stream loaded
-// Clicking on the buttons should load and play the folder :)
-//
-// v1.5
-// Semi-Working with Play, Stop and Next on Dialog
-// Moved error checking from the listen event into function next_track()
-// Starting to add some stuff in preparation for dialog box
-// 
-// v1.4
-// Added dump_spacers function and used it in a few places to make output easier to read
-// Added nothing_loaded() function to try and clean up and standardise error messages
-// Amended some parts to show some suggestions when nothing loaded (play, next)
-// 
-// Changed the part in listen to specifically need 'folder=' before the folder name
-// Hopefully this will stop some buggy stuff when unknown commands actually change the folder name even though folder not found.
-// Typing anything not recognised as a command will now show an error message and the help message :)
-//
-// Created function stop_music() to move the code for stop command into there
-// Added function dump_help and code in the listen event to liston for owner saying help
-// Added code in http_response to check for first 4 characters of the returned string to be LIST or FOLD
-// Added code to listen event to check for the folderlist command
-//
-// v1.3
-// Added dump_playlist function and code to check for the 'playlist' command :)
-// Removed default value for global var folder - it wasn't used anywhere
-// Added code to listen to jump to next track
-//
-// v1.2
-// Automatically play when new folder loaded successfully
-// Added error checking when looking for folder - message given when folder not found
-// Moved duplicate code to play the track into play_stream() [no paramaters required for play_stream now]
-// Moved code to jump to next track from timer event into new function next_track()
-// (Above will allow a future user triggered next track event)
-//
-// v1.1
-// Removed some old commented code and stopped saying the filelist in chat when changing folder
-// Created chat_listen global instead of hard-coding the listen channel
-// Building on experimental release of 1.0
 
-// Try making these global
+// Globals
 
+// For config file
+integer line;
+string config_file = "jukeboxclient.config";
+key readLineId;
+
+// script user needs to be authorised to use the server, these variables are read from their unique notecard
+string url;
+string base_path;
+
+// Playing variables
 list streams = [];
 integer list_length;
 list folders_list = [];    
 integer folders_list_length;
 key http_request_id;
-string url = "http://opensim.brillyunt.com/jukeboxserver.php?serverkey=xxxxxxxxxxx";
-//url = url + "?serverkey=" + serverkey;
 string folder = "";
 integer act_title = 0;
-string base_path = "http://opensim.brillyunt.com/mp3/";
 integer playing = 0;
 integer authorised = 0;
 
@@ -111,6 +37,95 @@ key ToucherID;
 integer channel_dialog;
 integer listen_id;
 
+init()
+{
+    // reset configuration values to default
+    url = "Unknown";
+    base_path = "Unknown";
+ 
+    // make sure the config file exists and is a notecard
+    if(llGetInventoryType(config_file) != INVENTORY_NOTECARD)
+    {
+        // notify owner of missing file
+        llOwnerSay("Missing inventory notecard: " + config_file);
+        return; // don't do anything else
+    }
+ 
+    // initialize to start reading from first line
+    line = 0;
+ 
+    // read the first line
+    readLineId = llGetNotecardLine(config_file, line++);
+}
+processConfiguration(string data)
+{
+    // if we are at the end of the file
+    if(data == EOF)
+    {
+        // notify the owner
+        llOwnerSay("We are done reading the configuration");
+ 
+        // notify what was read
+        llOwnerSay("url: " + url);
+        llOwnerSay("base_path: " + base_path);
+		llOwnerSay("Ready to Rumble, touch me baby!");
+ 
+        // do not do anything else
+        return;
+    }
+ 
+    // if we are not working with a blank line
+    if(data != "")
+    {
+        // if the line does not begin with a comment
+        if(llSubStringIndex(data, "#") != 0)
+        {
+            // find first equal sign
+            integer i = llSubStringIndex(data, "=");
+ 
+            // if line contains equal sign
+            if(i != -1)
+            {
+                // get name of name/value pair
+                string name = llGetSubString(data, 0, i - 1);
+ 
+                // get value of name/value pair
+                string value = llGetSubString(data, i + 1, -1);
+ 
+                // trim name
+                list temp = llParseString2List(name, [" "], []);
+                name = llDumpList2String(temp, " ");
+ 
+                // make name lowercase (case insensitive)
+                name = llToLower(name);
+ 
+                // trim value
+                temp = llParseString2List(value, [" "], []);
+                value = llDumpList2String(temp, " ");
+ 
+                // url
+                if(name == "url")
+                    url = value;
+ 
+                // base_path
+                else if(name == "base_path")
+                    base_path = value;
+ 
+                // unknown name    
+                else
+                    llOwnerSay("Unknown configuration value: " + name + " on line " + (string)line);
+ 
+            }
+            else  // line does not contain equal sign
+            {
+                llOwnerSay("Configuration could not be read on line " + (string)line);
+            }
+        }
+    }
+ 
+    // read the next line
+    readLineId = llGetNotecardLine(config_file, line++);
+ }
 
 
 // Declare a function to dump a couple of spacer lines
@@ -193,10 +208,30 @@ default
 {
     state_entry()
     {
+		// Try and read the Notecard (jukeboxclient.config)
+		init();
         // For dialogue box
         channel_dialog = ( -1 * (integer)("0x"+llGetSubString((string)llGetKey(),-5,-1)) );
-        
     }
+	
+    on_rez(integer start_param)
+    {
+		// Try and read the Notecard (jukeboxclient.config)
+		init();
+        // For dialogue box
+        channel_dialog = ( -1 * (integer)("0x"+llGetSubString((string)llGetKey(),-5,-1)) );
+    }
+    changed(integer change)
+    {
+        if(change & CHANGED_INVENTORY) init();
+    }
+    dataserver(key request_id, string data)
+    {
+        if(request_id == readLineId)
+            processConfiguration(data);
+ 
+    }
+	
     touch_start(integer total_number)
     {
         // Who touched me?
