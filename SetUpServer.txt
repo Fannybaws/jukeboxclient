@@ -1,0 +1,44 @@
+How to set up the server side of jukeboxclient...
+
+First of all, you obviously need a php enabled web server to host the files ;)
+This guide assumes you are familiar with editing php files and making files publicly available on your server.
+
+The server folder in the download contains a jukeboxserver.php.example file and and mp3 folder to hold the albums.
+
+The jukeboxserver.php.example file in the download should be renamed to jukeboxserver.php and edited to set up any users who are authorised to run the script.
+If there was no authorisation then the script could be copied and used by many users, resulting in heavy bandwidth usage on your server.
+
+Authorisation uses two keys, THIS_USERS_SERVERKEY_UUID and THIS_USERS_OWNER_UUID which are checked when the script contacts the server.
+
+THIS_USERS_OWNER_UUID is a unique key that you assign to the user you give your script to.
+It can be any unique string you choose, but I prefer to generate a UUID for each user (there are many websites that can do this for you, I usually use http://www.famkruithof.net/uuid/uuidgen)
+This string will be embedded in a Notecard you create and give to the user along with the script (more about that later).
+
+THIS_USERS_OWNER_UUID alone will not stop the user copying the script and giving it (along with the Notecard) to other users so we also check THIS_USERS_OWNER_UUID
+This is the In-World UUID of the user authorised to use the script and is part of the headers sent to the server by the In-World platform (e.g. Opensim)
+
+
+The format for each user is:
+
+//User Name 
+$users[n] = array('serverkey' => 'THIS_USERS_SERVERKEY_UUID' , 'ownerkey' => THIS_USERS_OWNER_UUID');
+
+The first line is a comment for your info only, you will probably want to put the user's In-World name avatar name in here but you can use anything you want
+
+$users[n] - as we are setting up an array, your first user will br $users[0], 2nd $users[1] etc
+
+THIS_USERS_SERVERKEY_UUID and THIS_USERS_OWNER_UUID should be replaced as explained above.
+
+
+This example shows what this section of the jukeboxserver.php file might look like using real values:
+
+//Set up some valid keys
+	
+//Fannybaws Tunwarm
+$users[0] = array('serverkey' => 'f6923fc3-1907-4d67-81e0-545cfe690249' , 'ownerkey' => '1fe7be3a-38d7-480d-b436-3b2131bc9299');
+
+//Kappa FaeBrillyunt
+$users[1] = array('serverkey' => '50137076-7802-40a0-bc9c-c37a0c3f2b36' , 'ownerkey' => 'efde9f29-e2cf-4953-85aa-db9a9fc3b567');
+
+//Fannybaws FaeBrillyunt
+$users[2] = array('serverkey' => '6a5ec4d1-94df-43bb-8527-048715b6bf59' , 'ownerkey' => '19079452-7bf8-43dc-82b1-b60179463415');
