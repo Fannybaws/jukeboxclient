@@ -1,0 +1,5 @@
+!01 Chumbawamba - Voices Thats All.mp3, 3, 30,
+!02 Kokomo Arnold - Sissy Man Blues.mp3, 0, 46,
+!03 Ma Rainey - Booze and Blues.mp3, 3, 18,
+!04 Mississippi John Hurt - Nobodys Dirty Business.mp3, 2, 54,
+!05 Tom Tom Club - Genius of Love.mp3, 7, 15

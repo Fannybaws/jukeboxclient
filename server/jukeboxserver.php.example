@@ -15,11 +15,11 @@
 	
 	//Set up some valid keys
 	
-	//Fannybaws Tunwarm
+	//First User
 	$users[0] = array('serverkey' => 'SERVERKEY_UUID' , 'ownerkey' => 'OWNER_UUID');
-	//Kappa FaeBrillyunt
+	//Second User
 	$users[1] = array('serverkey' => 'SERVERKEY_UUID' , 'ownerkey' => 'OWNER_UUID');
-	//Fannybaws FaeBrillyunt
+	//Third User
 	$users[2] = array('serverkey' => 'SERVERKEY_UUID' , 'ownerkey' => 'OWNER_UUID');
 	
 	//Check for an authorised user
@@ -75,13 +75,7 @@
 		echo  'FOLD' . $return;
 		appendLog($headers, "received contents of folder " . $_GET["folder"] );
 	}
-	else
-	{
-		$path = 'mp3/ballads/';
-		$return = file_get_contents($path . 'list.txt');
-		echo $return;
-		appendLog($headers, "received contents of folder ballads" );
-	}
+
 
 	function appendLog ($headers, $message)
 	{

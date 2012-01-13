@@ -42,3 +42,37 @@ $users[1] = array('serverkey' => '50137076-7802-40a0-bc9c-c37a0c3f2b36' , 'owner
 
 //Fannybaws FaeBrillyunt
 $users[2] = array('serverkey' => '6a5ec4d1-94df-43bb-8527-048715b6bf59' , 'ownerkey' => '19079452-7bf8-43dc-82b1-b60179463415');
+
+
+**********
+
+The mp3 folder, as the name suggests, should contain all the albums you want the users to be able to stream ;)
+
+We have included an example folder called 'FreeStuff' that contains tracks that (to the best of our knowledge, and we have checked!) are in the public domain and free to copy.
+
+Each album's folder name will be used as a button text In-World, so you should limit it to 9 characters
+
+The individual mp3 file names can be anything you want - within reason, keep them simple as some characters might cause problems when trying to display In-World.
+
+Each folder also needs a 'list.txt' file that contains a playlist for the album - it is up to you to create that file!
+jukeboxserver.php will parse this file and add the contents to a list that is sent to the script that runs In-World
+
+Have a look at the example in list.txt the FreeStuff folder...
+
+!01 Chumbawamba - Voices Thats All.mp3, 3, 30,
+!02 Kokomo Arnold - Sissy Man Blues.mp3, 0, 46,
+!03 Ma Rainey - Booze and Blues.mp3, 3, 18,
+!04 Mississippi John Hurt - Nobodys Dirty Business.mp3, 2, 54,
+!05 Tom Tom Club - Genius of Love.mp3, 7, 15
+
+Each line starts with ! (this is needed for technical reasons to allow parsing the list In-World
+This is immediately followed by:
+MP3 FILE NAME (comma) TRACK LENGTH MINUTES (comma) TRACK LENGTH SECONDS (comma unless this is the last track)
+
+Looking at the first line of our example above, jukeboxserver.php will load "01 Chumbawamba - Voices Thats All.mp3 into the list and set the playing time to 3:30 (3 minutes, 30 seconds - the length of the track, this time allows the In-World script to know when to jump to the next track)
+
+As we have a comma at the end of that line, jukeboxserver.php knows that there are more tracks to be added to the list so will continue with the next line.
+The final line (!05 Tom Tom Club - Genius of Love.mp3, 7, 15) does not have a comma at the end jukeboxserver.php knows it has reached the end of tracks to add to the list.
+
+
+
