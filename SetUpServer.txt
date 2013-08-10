@@ -10,11 +10,11 @@ If there was no authorisation then the script could be copied and used by many u
 
 Authorisation uses two keys, THIS_USERS_SERVERKEY_UUID and THIS_USERS_OWNER_UUID which are checked when the script contacts the server.
 
-THIS_USERS_OWNER_UUID is a unique key that you assign to the user you give your script to.
+THIS_USERS_SERVERKEY_UUID is a unique key that you assign to the user you give your script to.
 It can be any unique string you choose, but I prefer to generate a UUID for each user (there are many websites that can do this for you, I usually use http://www.famkruithof.net/uuid/uuidgen)
 This string will be embedded in a Notecard you create and give to the user along with the script (more about that later).
 
-THIS_USERS_OWNER_UUID alone will not stop the user copying the script and giving it (along with the Notecard) to other users so we also check THIS_USERS_OWNER_UUID
+THIS_USERS_SERVERKEY_UUID alone will not stop the user copying the script and giving it (along with the Notecard) to other users so we also check THIS_USERS_OWNER_UUID
 This is the In-World UUID of the user authorised to use the script and is part of the headers sent to the server by the In-World platform (e.g. Opensim)
 
 
@@ -25,7 +25,7 @@ $users[n] = array('serverkey' => 'THIS_USERS_SERVERKEY_UUID' , 'ownerkey' => THI
 
 The first line is a comment for your info only, you will probably want to put the user's In-World name avatar name in here but you can use anything you want
 
-$users[n] - as we are setting up an array, your first user will br $users[0], 2nd $users[1] etc
+$users[n] - as we are setting up an array, your first user will be $users[0], 2nd $users[1] etc
 
 THIS_USERS_SERVERKEY_UUID and THIS_USERS_OWNER_UUID should be replaced as explained above.
 
