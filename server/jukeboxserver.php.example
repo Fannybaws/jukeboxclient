@@ -26,8 +26,8 @@
 	$authorised = false;
 	foreach ($users as $thisUser)
 	{
-		$thisServerKey = $thisUser[serverkey];
-		$thisOwnerKey = $thisUser[ownerkey];
+		$thisServerKey = $thisUser['serverkey'];
+		$thisOwnerKey = $thisUser['ownerkey'];
 		//echo $thisServerKey . " - " . $thisOwnerKey . "\n";
 		//echo $serverkey . " - " . $ownerkey . "\n";
 		
@@ -49,7 +49,7 @@
 		exit;
 	}
 
-	if ($_GET["list"])
+	if ($_GET['list'])
 	{
 		if ($handle = opendir("mp3/"))
 		{
@@ -68,7 +68,7 @@
 			appendLog($headers, "received folderlist");
 		}
 	}
-	else if ($_GET["folder"])
+	else if ($_GET['folder'])
 	{
 		$path = 'mp3/' . $_GET["folder"] . '/';
 		$return = file_get_contents($path . 'list.txt');
