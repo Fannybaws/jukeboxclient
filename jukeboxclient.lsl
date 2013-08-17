@@ -1,9 +1,12 @@
 // jukeboxclient
 //
 // Author: Fannybaws Tunwarm
-// Copyright 2010,2011 - Fannybaws Tunwarm
+// Copyright 2010,2011,2012,2013 - Fannybaws Tunwarm
 // This script may be freely copied and modified so long as this header
 // remains unmodified.
+//
+// Contributors:
+// KFCSpike
 // 
 // v2.0 - Initial upload to github, These infile version details will no longer be updated!
 // renamed to jukeboxclient and now using jukeboxserver.php server side
@@ -66,8 +69,8 @@ processConfiguration(string data)
         llOwnerSay("We are done reading the configuration");
  
         // notify what was read
-        llOwnerSay("url: " + url);
-        llOwnerSay("base_path: " + base_path);
+        // llOwnerSay("url: " + url);
+        // llOwnerSay("base_path: " + base_path);
 		llOwnerSay("Ready to Rumble, touch me baby!");
  
         // do not do anything else
